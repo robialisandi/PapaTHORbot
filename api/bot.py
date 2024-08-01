@@ -74,7 +74,11 @@ async def meme(update: Update, context: CallbackContext) -> None:
 
 @app.route('/api/bot', methods=['POST'])
 def webhook():
-    global application  # Pastikan menggunakan variabel global
+    global application
+    if application is None:
+        logger.error("Application not initialized")
+        return 'Internal Server Error', 500
+    
     try:
         data = request.get_json()
         logger.info(f"Received update: {data}")
@@ -88,6 +92,10 @@ def webhook():
 def main():
     global application
     bot_token = os.getenv('BOT_TOKEN')
+    if not bot_token:
+        logger.error("BOT_TOKEN is not set in environment variables")
+        return
+
     application = Application.builder().token(bot_token).build()
     application.add_handler(CommandHandler('start', start))
     application.add_handler(CommandHandler('help', help))
@@ -96,6 +104,9 @@ def main():
     # Set webhook URL
     webhook_url = os.getenv('WEBHOOK_URL') + '/api/bot'
     application.bot.set_webhook(webhook_url)
+
+    # Start the bot
+    application.run_polling()
 
 if __name__ == '__main__':
     main()
