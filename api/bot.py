@@ -76,9 +76,9 @@ async def meme(update: Update, context: CallbackContext) -> None:
 def webhook():
     global application
     if application is None:
-        logger.error("Application not initialized")
+        logger.error("Application is not initialized")
         return 'Internal Server Error', 500
-    
+
     try:
         data = request.get_json()
         logger.info(f"Received update: {data}")
@@ -89,7 +89,7 @@ def webhook():
         logger.error(f"Error processing update: {e}")
         return 'Internal Server Error', 500
 
-def main():
+def init_application():
     global application
     bot_token = os.getenv('BOT_TOKEN')
     if not bot_token:
@@ -103,10 +103,13 @@ def main():
 
     # Set webhook URL
     webhook_url = os.getenv('WEBHOOK_URL') + '/api/bot'
+    logger.info(f"Setting webhook to: {webhook_url}")
     application.bot.set_webhook(webhook_url)
 
-    # Start the bot
-    application.run_polling()
+def main():
+    init_application()
+    # Run the Flask app
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
 
 if __name__ == '__main__':
     main()
