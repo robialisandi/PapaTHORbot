@@ -71,14 +71,19 @@ async def meme(update: Update, context: CallbackContext) -> None:
 
 @app.route('/api/bot', methods=['POST'])
 def webhook():
-    data = request.get_json()
-    update = Update.de_json(data, application.bot)
-    application.update_queue.put(update)
-    return 'OK'
+    try:
+        data = request.get_json()
+        logger.info(f"Received update: {data}")
+        update = Update.de_json(data, application.bot)
+        application.update_queue.put(update)
+        return 'OK'
+    except Exception as e:
+        logger.error(f"Error processing update: {e}")
+        return 'Internal Server Error', 500
 
 def main():
-    bot_token = os.getenv('BOT_TOKEN')
     global application
+    bot_token = os.getenv('BOT_TOKEN')
     application = Application.builder().token(bot_token).build()
     application.add_handler(CommandHandler('start', start))
     application.add_handler(CommandHandler('help', help))
