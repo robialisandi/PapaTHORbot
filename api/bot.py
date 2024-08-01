@@ -16,6 +16,9 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
+# Variabel global untuk Application
+application = None
+
 async def start(update: Update, context: CallbackContext) -> None:
     chat = update.effective_chat
     if chat.type == 'private':
@@ -71,6 +74,7 @@ async def meme(update: Update, context: CallbackContext) -> None:
 
 @app.route('/api/bot', methods=['POST'])
 def webhook():
+    global application  # Pastikan menggunakan variabel global
     try:
         data = request.get_json()
         logger.info(f"Received update: {data}")
