@@ -75,7 +75,6 @@ async def meme(update: Update, context: CallbackContext) -> None:
 
 @app.route('/api/bot', methods=['POST'])
 def webhook():
-    global application
     if application is None:
         logger.error("Application is not initialized")
         return 'Internal Server Error', 500
@@ -112,6 +111,10 @@ def init_application():
 
 def main():
     init_application()
+    # Ensure that application is initialized before starting Flask server
+    if application is None:
+        logger.error("Failed to initialize the application.")
+        return
     # Run the Flask app
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
 
