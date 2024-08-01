@@ -70,6 +70,7 @@ async def meme(update: Update, context: CallbackContext) -> None:
         else:
             await update.message.reply_text('Terjadi kesalahan dalam mengambil meme.')
     except Exception as e:
+        logger.error(f"Error in meme function: {str(e)}")
         await update.message.reply_text(f'Maaf, terjadi kesalahan: {str(e)}', parse_mode=ParseMode.HTML)
 
 @app.route('/api/bot', methods=['POST'])
@@ -104,7 +105,10 @@ def init_application():
     # Set webhook URL
     webhook_url = os.getenv('WEBHOOK_URL') + '/api/bot'
     logger.info(f"Setting webhook to: {webhook_url}")
-    application.bot.set_webhook(webhook_url)
+    try:
+        application.bot.set_webhook(webhook_url)
+    except Exception as e:
+        logger.error(f"Error setting webhook: {e}")
 
 def main():
     init_application()
