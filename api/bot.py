@@ -43,7 +43,7 @@ async def help(update: Update, context: CallbackContext) -> None:
 async def meme(update: Update, context: CallbackContext) -> None:
     try:
         chat_id = update.effective_chat.id
-        context.bot.send_chat_action(chat_id=chat_id, action=ChatAction.TYPING)
+        await context.bot.send_chat_action(chat_id=chat_id, action=ChatAction.TYPING)
 
         url_meme = 'https://api.imgflip.com/caption_image'
         input_text = ' '.join(context.args)
@@ -84,10 +84,9 @@ def main():
     application.add_handler(CommandHandler('help', help))
     application.add_handler(CommandHandler('meme', meme))
 
-    webhook_url = os.getenv('WEBHOOK_URL')
+    # Set webhook URL
+    webhook_url = os.getenv('WEBHOOK_URL') + '/api/bot'
     application.bot.set_webhook(webhook_url)
-
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == '__main__':
     main()
